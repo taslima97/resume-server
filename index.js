@@ -26,31 +26,57 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
 
     const toysCollection = client.db('SportsToy').collection('toys')
+    const userCollection = client.db('SportsToy').collection('insertToys')
 
-    app.get('/alltab/:text', async(req, res)=>{
-        console.log(req.params.text)
-        if(req.params.text == 'Single Sports' || req.params.text == 'Group Sports' || req.params.text == 'Combat Sports'){
-            const result = await toysCollection.find({category: req.params.text}).toArray();
-           return res.send(result)
-        }
-        const result = await toysCollection.find({}).toArray();
-        res.send(result)
+    app.get('/alltab/text', async (req, res) => {
+      const cursor = toysCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.get('/alltab/:text', async (req, res) => {
+      console.log(req.params.text)
+      if (req.params.text == 'Single Sports' || req.params.text == 'Group Sports' || req.params.text == 'Combat Sports') {
+        const result = await toysCollection.find({ category: req.params.text }).toArray();
+        return res.send(result)
+      }
+      const result = await toysCollection.find({}).toArray();
+      res.send(result)
     });
 
 
-    app.get('/alltab/text/:id',async(req, res)=>{
-const id = req.params.id;
-const query = {_id: new ObjectId(id)}
-const result = await toysCollection.findOne(query);
-res.send(result)
+    // app.get('/alltab/text/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) }
+    //   const result = await toysCollection.findOne(query);
+    //   res.send(result)
+    // })
+
+    app.get('/insertToy', async(req, res)=>{
+      console.log(req.query.email)
+      let query = {};
+      if (req.query?.email) {
+        query = {email:req.query.email}
+      }
+      const result = await userCollection.find(query).toArray();
+      
+      res.send(result)
+    })
+
+
+    app.post('/insertToy', async(req, res)=>{
+      const addedData = req.body;
+      // console.log(addedData)
+      const result = await userCollection .insertOne(addedData);
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
@@ -62,11 +88,11 @@ run().catch(console.dir);
 
 
 
-app.get('/', (req, res)=>{
-    res.send('sports is running')
+app.get('/', (req, res) => {
+  res.send('sports is running')
 });
 
 
-app.listen(port, ()=>{
-    console.log(`sports server API:${port}`)
+app.listen(port, () => {
+  console.log(`sports server API:${port}`)
 })
