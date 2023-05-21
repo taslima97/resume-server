@@ -49,32 +49,45 @@ async function run() {
     });
 
 
-    app.get('/insertToy', async(req, res)=>{
+    app.get('/insertToy', async (req, res) => {
       console.log(req.query.email)
       let query = {};
       if (req.query?.email) {
-        query = {email:req.query.email}
+        query = { email: req.query.email }
       }
       const result = await toysCollection.find(query).toArray();
-      
+
       res.send(result)
     })
 
 
-    app.post('/insertToy', async(req, res)=>{
+    app.post('/insertToy', async (req, res) => {
       const addedData = req.body;
       // console.log(addedData)
-      const result = await toysCollection .insertOne(addedData);
+      const result = await toysCollection.insertOne(addedData);
+      res.send(result)
+    });
+
+    app.patch('/insertToy/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const updatedToy = req.body;
+      const updateDoc = {
+        $set: {
+          status: updatedToy.status
+        }
+      }
+      const result = await toysCollection.updateOne(filter, updateDoc);
       res.send(result)
     })
 
 
-app.delete('/insertToy/:id',async(req, res)=>{
-  const id = req.params.id;
-  const query = {_id: new ObjectId(id)}
-  const result = await toysCollection.deleteOne(query);
-  res.send(result)
-})
+    app.delete('/insertToy/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await toysCollection.deleteOne(query);
+      res.send(result)
+    })
 
 
     // Send a ping to confirm a successful connection
