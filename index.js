@@ -30,7 +30,7 @@ async function run() {
 
 
     const toysCollection = client.db('SportsToy').collection('toys')
-    const userCollection = client.db('SportsToy').collection('insertToys')
+    // const userCollection = client.db('SportsToy').collection('insertToys')
 
     app.get('/alltab/text', async (req, res) => {
       const cursor = toysCollection.find();
@@ -49,20 +49,13 @@ async function run() {
     });
 
 
-    // app.get('/alltab/text/:id', async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) }
-    //   const result = await toysCollection.findOne(query);
-    //   res.send(result)
-    // })
-
     app.get('/insertToy', async(req, res)=>{
       console.log(req.query.email)
       let query = {};
       if (req.query?.email) {
         query = {email:req.query.email}
       }
-      const result = await userCollection.find(query).toArray();
+      const result = await toysCollection.find(query).toArray();
       
       res.send(result)
     })
@@ -71,7 +64,7 @@ async function run() {
     app.post('/insertToy', async(req, res)=>{
       const addedData = req.body;
       // console.log(addedData)
-      const result = await userCollection .insertOne(addedData);
+      const result = await toysCollection .insertOne(addedData);
       res.send(result)
     })
 
